@@ -81,7 +81,10 @@ function mountSite(files) {
   injectCSS(files, blobMap);
 
   // ---- JS ----
-  injectJS(files, blobMap);
+  //injectJS(files, blobMap);
+
+  injectJSFromHTML(doc, blobMap);
+
 }
 
 // ================= BLOB MAP =================
@@ -165,6 +168,21 @@ async function injectJS(files, blobMap) {
     const s = document.createElement("script");
     s.src = blobMap[path];
     document.body.appendChild(s);
+    await new Promise(r => (s.onload = r));
+  }
+}
+
+async function injectJSFromHTML(doc, blobMap) {
+  const scripts = [...doc.querySelectorAll("script[src]")];
+
+  for (const el of scripts) {
+    const src = el.getAttribute("src");
+    if (!blobMap[src]) continue;
+
+    const s = document.createElement("script");
+    s.src = blobMap[src];
+    document.body.appendChild(s);
+
     await new Promise(r => (s.onload = r));
   }
 }
