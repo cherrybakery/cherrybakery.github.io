@@ -42,6 +42,19 @@ for /f %%b in ('git rev-parse --abbrev-ref HEAD') do (
 
 git pull
 git add -A 
+
+echo Đang quét và add từng file (bỏ qua các file bị lỗi/lock)...
+for /f "delims=" %%i in ('git ls-files --others --modified --exclude-standard') do (
+    git add "%%i" 2>nul
+    if errorlevel 1 (
+        echo [SKIP] Khong the add: %%i
+    ) else (
+        echo [OK] Added: %%i
+    )
+)
+echo.
+echo Hoan tat! Kiem tra trang thai bang 'git status'.
+
 git commit -am "." 
 rem git push -f
 git push -f -u origin --all
